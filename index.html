@@ -1,444 +1,598 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="WaterSplash is an interactive web-based game developed using HTML5, CSS3, and JavaScript. Avoid obstacles and score as high as you can!">
-    <meta name="keywords" content="game development, HTML5 game, Water Splash game,JavaScript game, canvas game, web game, interactive game, browser game, HTML5 canvas game, JavaScript canvas game, HTML game development, web-based game, responsive game, touch controls, arcade game, simple game, educational game, fun game, HTML5 canvas animation, JavaScript animation">
-    <meta name="author" content="Mr. Imoro Abubakari">
-    <title>Water Splash | Powered by Ghana-gpt.com</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Play Water Splash, a colorful browser arcade game. Dodge obstacles, collect points, and beat your best score.">
+  <meta name="author" content="Imoro Abubakari">
+  <meta name="theme-color" content="#087db5">
+  <title>Water Splash | Ghana-GPT</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --ink: #123047;
+      --blue: #087db5;
+      --blue-dark: #075d8a;
+      --surface: rgba(255, 255, 255, .9);
+    }
 
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(to bottom, #e0f7ff, #87ceeb);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            touch-action: none;
-        }
+    * { box-sizing: border-box; }
 
-        #game-container {
-            position: relative;
-            width: 90vw;
-            max-width: 800px;
-            height: 80vh;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-        }
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      min-height: 100svh;
+      margin: 0;
+      padding: 18px;
+      display: grid;
+      place-items: center;
+      color: var(--ink);
+      background: linear-gradient(145deg, #dff8ff, #76c9ea 55%, #a5e8e8);
+    }
 
-        #start-screen {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.9);
-            z-index: 10;
-        }
+    .page { width: min(94vw, 860px); }
 
-        h1 {
-            color: #1e90ff;
-            font-size: 3em;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-        }
+    .game-shell {
+      position: relative;
+      height: min(78vh, 720px);
+      height: min(78svh, 720px);
+      min-height: 390px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.75);
+      border-radius: 22px;
+      background: #bcecf7;
+      box-shadow: 0 20px 55px rgba(8, 63, 91, .2);
+      isolation: isolate;
+    }
 
-        #start-btn {
-            padding: 15px 30px;
-            font-size: 1.2em;
-            background: #1e90ff;
-            color: white;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: transform 0.2s;
-            -webkit-tap-highlight-color: transparent;
-        }
+    canvas { display: block; width: 100%; height: 100%; touch-action: none; }
 
-        #start-btn:hover {
-            transform: scale(1.1);
-        }
+    .hud {
+      position: absolute;
+      z-index: 2;
+      inset: 14px 14px auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      pointer-events: none;
+    }
 
-        #game-canvas {
-            width: 100%;
-            height: 100%;
-            touch-action: none;
-        }
-        .copyright{
-            margin: 5px 5px;
-            box-shadow: 5px 5px red;
-            border-radius: 30%;
-            color: rgb(0, 0, 0);
-            text-align: center;
-            
-        }
-        .copyright a{
-            text-decoration: none;
+    .hud-group { display: flex; align-items: center; gap: 8px; }
+    .badge, .icon-button {
+      border: 1px solid rgba(255,255,255,.85);
+      border-radius: 999px;
+      background: rgba(255,255,255,.82);
+      color: var(--ink);
+      box-shadow: 0 3px 12px rgba(7,62,90,.1);
+      backdrop-filter: blur(8px);
+    }
+    .badge { padding: 9px 13px; font-size: .9rem; font-weight: 750; }
+    .icon-button {
+      min-width: 42px;
+      min-height: 42px;
+      padding: 8px 12px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      pointer-events: auto;
+    }
+    .icon-button:hover { background: white; }
+    .icon-button:focus-visible, .primary-button:focus-visible {
+      outline: 3px solid #ffcf52;
+      outline-offset: 3px;
+    }
 
-        }
-        .copyright  a:hover{
-            font-weight: 50px;
-            font-size: 20px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+    .overlay {
+      position: absolute;
+      z-index: 3;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 22px;
+      background: rgba(6, 43, 63, .28);
+      backdrop-filter: blur(5px);
+    }
+    .overlay[hidden] { display: none; }
+    .dialog {
+      width: min(100%, 430px);
+      padding: clamp(24px, 5vw, 38px);
+      border: 1px solid rgba(255,255,255,.85);
+      border-radius: 22px;
+      background: var(--surface);
+      text-align: center;
+      box-shadow: 0 18px 50px rgba(5, 47, 69, .2);
+    }
+    h1 { margin: 0 0 10px; color: var(--blue-dark); font-size: clamp(2.2rem, 8vw, 3.4rem); line-height: 1; }
+    .subtitle { margin: 0 auto 22px; max-width: 34ch; line-height: 1.55; }
+    .help { margin: 18px 0 0; color: #35566a; font-size: .9rem; line-height: 1.5; }
+    .primary-button {
+      min-height: 48px;
+      padding: 12px 24px;
+      border: 0;
+      border-radius: 999px;
+      color: #fff;
+      background: var(--blue);
+      font: inherit;
+      font-weight: 750;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(8,125,181,.25);
+      transition: transform .16s ease, background .16s ease;
+    }
+    .primary-button:hover { transform: translateY(-2px); background: var(--blue-dark); }
+    .copyright { padding: 12px 6px 0; text-align: center; font-size: .9rem; }
+    .copyright a { color: #075d8a; font-weight: 700; text-decoration-thickness: 1px; text-underline-offset: 3px; }
 
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2em;
-            }
-            
-            #start-btn {
-                padding: 12px 24px;
-                font-size: 1em;
-            }
-        }
-    </style>
+    @media (max-width: 520px) {
+      body { padding: 10px; }
+      .game-shell { height: 76svh; min-height: 360px; border-radius: 16px; }
+      .hud { inset: 10px 9px auto; gap: 5px; }
+      .hud-group { gap: 5px; }
+      .badge { padding: 8px 10px; font-size: .8rem; }
+      .icon-button { min-width: 40px; min-height: 40px; padding: 7px 10px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+    }
+  </style>
 </head>
 <body>
-    <div id="game-container">
-        <div id="start-screen">
-            <h1>Water Splash</h1>
-            <button id="start-btn">Start Game</button>
-            
+  <main class="page">
+    <section class="game-shell" id="game-shell" aria-label="Water Splash game">
+      <canvas id="game-canvas" aria-label="Game area. Move the blue water drop to dodge falling obstacles."></canvas>
+
+      <div class="hud" aria-label="Game controls and score">
+        <div class="hud-group">
+          <div class="badge" id="score-label" aria-live="polite">Score: 0</div>
+          <div class="badge" id="best-label">Best: 0</div>
         </div>
-        <canvas id="game-canvas"></canvas>
-    </div>
-    <div  class="copyright">
-        <p>Water Splash Game &copy; 2025. | Design by 
-            <a href="https://ghana-gpt.com">
-                ghana-gpt.com
-            </a>
-        </p>
-    </div>
+        <div class="hud-group">
+          <button class="icon-button" id="sound-button" type="button" aria-label="Turn sound off" title="Toggle sound">Sound on</button>
+          <button class="icon-button" id="pause-button" type="button" aria-label="Pause game" title="Pause game" hidden>Pause</button>
+        </div>
+      </div>
 
-    <script>
-        const gameContainer = document.getElementById('game-container');
-        const startScreen = document.getElementById('start-screen');
-        const startBtn = document.getElementById('start-btn');
-        const canvas = document.getElementById('game-canvas');
-        const ctx = canvas.getContext('2d');
+      <section class="overlay" id="menu-overlay" aria-labelledby="menu-title">
+        <div class="dialog">
+          <h1 id="menu-title">Water Splash</h1>
+          <p class="subtitle" id="menu-message">Dodge the floating logs and see how long you can stay afloat.</p>
+          <button class="primary-button" id="start-button" type="button">Start game</button>
+          <p class="help">Move with ← / → or A / D. On a touchscreen, drag your finger or tap where you want to move. Press P or Escape to pause.</p>
+        </div>
+      </section>
 
-        let gameRunning = false;
-        let animationFrameId;
-        
-        const player = {
-            x: 0,
-            y: 0,
-            size: 30,
-            speed: 5
-        };
+      <section class="overlay" id="pause-overlay" aria-labelledby="pause-title" hidden>
+        <div class="dialog">
+          <h1 id="pause-title">Paused</h1>
+          <p class="subtitle">Take a breather. The water will wait.</p>
+          <button class="primary-button" id="resume-button" type="button">Resume</button>
+          <p class="help">Press P or Escape to resume.</p>
+        </div>
+      </section>
+    </section>
 
-        const obstacles = [];
-        let score = 0;
-        let difficulty = 1;
+    <footer class="copyright">Water Splash Game &copy; 2026 · Made by <a href="https://ghana-gpt.com">Ghana-GPT</a></footer>
+  </main>
 
-        function initGame() {
-            canvas.width = gameContainer.clientWidth;
-            canvas.height = gameContainer.clientHeight;
-            player.x = canvas.width / 2 - player.size / 2;
-            player.y = canvas.height - player.size * 2;
-            
-            // Reset game state
-            obstacles.length = 0;
-            score = 0;
-            difficulty = 1;
+  <script>
+    (() => {
+      'use strict';
+
+      const shell = document.getElementById('game-shell');
+      const canvas = document.getElementById('game-canvas');
+      const ctx = canvas.getContext('2d');
+      const menuOverlay = document.getElementById('menu-overlay');
+      const pauseOverlay = document.getElementById('pause-overlay');
+      const menuTitle = document.getElementById('menu-title');
+      const menuMessage = document.getElementById('menu-message');
+      const startButton = document.getElementById('start-button');
+      const resumeButton = document.getElementById('resume-button');
+      const pauseButton = document.getElementById('pause-button');
+      const soundButton = document.getElementById('sound-button');
+      const scoreLabel = document.getElementById('score-label');
+      const bestLabel = document.getElementById('best-label');
+      const STORAGE_KEY = 'water-splash-best-score';
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      let width = 0;
+      let height = 0;
+      let pixelRatio = 1;
+      let state = 'menu';
+      let score = 0;
+      let best = readBestScore();
+      let difficulty = 1;
+      let spawnCountdown = 0.6;
+      let lastTime = 0;
+      let worldTime = 0;
+      let audioContext = null;
+      let soundEnabled = true;
+      const keys = new Set();
+      const obstacles = [];
+      const particles = [];
+      const waves = Array.from({ length: 5 }, (_, i) => ({
+        y: 0.2 + i * 0.17,
+        amplitude: 5 + i * 2,
+        speed: 0.45 + i * 0.12,
+        phase: i * 1.7,
+        alpha: 0.08 + i * 0.018
+      }));
+      const player = { x: 0, y: 0, radius: 16, speed: 360, targetX: null };
+
+      function readBestScore() {
+        try { return Number(localStorage.getItem(STORAGE_KEY)) || 0; }
+        catch { return 0; }
+      }
+
+      function saveBestScore() {
+        try { localStorage.setItem(STORAGE_KEY, String(best)); }
+        catch { /* Local storage may be disabled; the game still works. */ }
+      }
+
+      function setSoundButton() {
+        soundButton.textContent = soundEnabled ? 'Sound on' : 'Sound off';
+        soundButton.setAttribute('aria-label', soundEnabled ? 'Turn sound off' : 'Turn sound on');
+        soundButton.setAttribute('aria-pressed', String(soundEnabled));
+      }
+
+      function playTone(frequency, duration = 0.12, type = 'sine', volume = 0.045) {
+        if (!soundEnabled) return;
+        try {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (!AudioContextClass) return;
+          audioContext ||= new AudioContextClass();
+          if (audioContext.state === 'suspended') audioContext.resume();
+          const oscillator = audioContext.createOscillator();
+          const gain = audioContext.createGain();
+          oscillator.type = type;
+          oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+          gain.gain.setValueAtTime(volume, audioContext.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration);
+          oscillator.connect(gain);
+          gain.connect(audioContext.destination);
+          oscillator.start();
+          oscillator.stop(audioContext.currentTime + duration);
+        } catch { /* Audio is optional; gameplay should never depend on it. */ }
+      }
+
+      function resizeCanvas() {
+        const rect = shell.getBoundingClientRect();
+        const oldWidth = width;
+        const oldHeight = height;
+        width = rect.width;
+        height = rect.height;
+        pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.round(width * pixelRatio);
+        canvas.height = Math.round(height * pixelRatio);
+        ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+
+        if (!oldWidth || !oldHeight) {
+          player.x = width / 2;
+          player.y = height - 58;
+        } else {
+          const scaleX = width / oldWidth;
+          const scaleY = height / oldHeight;
+          player.x = clamp(player.x * scaleX, player.radius, width - player.radius);
+          player.y = height - 58;
+          for (const obstacle of obstacles) {
+            obstacle.x *= scaleX;
+            obstacle.y *= scaleY;
+            obstacle.width *= scaleX;
+          }
+        }
+      }
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function updateHud() {
+        scoreLabel.textContent = `Score: ${score}`;
+        bestLabel.textContent = `Best: ${best}`;
+      }
+
+      function startGame() {
+        score = 0;
+        difficulty = 1;
+        spawnCountdown = 0.45;
+        obstacles.length = 0;
+        particles.length = 0;
+        keys.clear();
+        player.x = width / 2;
+        player.y = height - 58;
+        player.targetX = null;
+        menuOverlay.hidden = true;
+        pauseOverlay.hidden = true;
+        pauseButton.hidden = false;
+        state = 'playing';
+        lastTime = 0;
+        updateHud();
+        playTone(520, 0.16, 'sine', 0.035);
+      }
+
+      function pauseGame() {
+        if (state !== 'playing') return;
+        state = 'paused';
+        keys.clear();
+        pauseOverlay.hidden = false;
+        pauseButton.textContent = 'Resume';
+        pauseButton.setAttribute('aria-label', 'Resume game');
+        playTone(330, 0.09, 'sine', 0.025);
+      }
+
+      function resumeGame() {
+        if (state !== 'paused') return;
+        state = 'playing';
+        pauseOverlay.hidden = true;
+        pauseButton.textContent = 'Pause';
+        pauseButton.setAttribute('aria-label', 'Pause game');
+        lastTime = 0;
+        playTone(440, 0.09, 'sine', 0.025);
+      }
+
+      function finishGame() {
+        if (state !== 'playing') return;
+        state = 'gameover';
+        pauseButton.hidden = true;
+        menuTitle.textContent = 'Game over';
+        menuMessage.textContent = `You scored ${score}. Your best score is ${best}.`;
+        startButton.textContent = 'Play again';
+        menuOverlay.hidden = false;
+        playTone(180, 0.36, 'triangle', 0.06);
+      }
+
+      function spawnObstacle() {
+        const obstacleWidth = 48 + Math.random() * Math.min(78, width * 0.16);
+        const obstacleHeight = 19 + Math.random() * 8;
+        obstacles.push({
+          x: Math.random() * Math.max(1, width - obstacleWidth),
+          y: -obstacleHeight - 4,
+          width: obstacleWidth,
+          height: obstacleHeight,
+          speed: 155 + difficulty * 22 + Math.random() * 30,
+          hue: 24 + Math.random() * 19
+        });
+      }
+
+      function burst(x, y, color, count = 12) {
+        for (let i = 0; i < count; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const speed = 35 + Math.random() * 150;
+          particles.push({
+            x, y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            radius: 2 + Math.random() * 4,
+            life: 0.35 + Math.random() * 0.5,
+            maxLife: 0.85,
+            color
+          });
+        }
+      }
+
+      function update(dt) {
+        worldTime += dt;
+        if (state !== 'playing') return;
+
+        let direction = 0;
+        if (keys.has('ArrowLeft') || keys.has('a') || keys.has('A')) direction -= 1;
+        if (keys.has('ArrowRight') || keys.has('d') || keys.has('D')) direction += 1;
+        if (direction) {
+          player.x += direction * player.speed * dt;
+          player.targetX = null;
+        } else if (player.targetX !== null) {
+          const delta = player.targetX - player.x;
+          player.x += clamp(delta, -player.speed * dt, player.speed * dt);
+          if (Math.abs(delta) < 2) player.targetX = null;
+        }
+        player.x = clamp(player.x, player.radius, width - player.radius);
+
+        spawnCountdown -= dt;
+        if (spawnCountdown <= 0) {
+          spawnObstacle();
+          const interval = Math.max(0.38, 1.05 - difficulty * 0.035);
+          spawnCountdown = interval * (0.72 + Math.random() * 0.56);
         }
 
-        function createObstacle() {
-            const width = Math.random() * (100 - 30) + 30;
-            obstacles.push({
-                x: Math.random() * (canvas.width - width),
-                y: -50,
-                width: width,
-                height: 20,
-                speed: 2 + difficulty
-            });
-        }
-
-        function startGame() {
-            startScreen.style.display = 'none';
-            gameRunning = true;
-            initGame();
-            gameLoop();
-        }
-
-        function endGame() {
-            gameRunning = false;
-            cancelAnimationFrame(animationFrameId);
-            startScreen.style.display = 'flex';
-            alert(`Game Over! Score: ${score}`);
-        }
-
-        function gameLoop() {
-            if (!gameRunning) return;
-
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Draw and update player
-            ctx.fillStyle = '#1e90ff';
-            ctx.beginPath();
-            ctx.arc(player.x + player.size/2, player.y + player.size/2, player.size/2, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Create new obstacles
-            if (Math.random() < 0.02 * difficulty) {
-                createObstacle();
+        for (let i = obstacles.length - 1; i >= 0; i--) {
+          const obstacle = obstacles[i];
+          obstacle.y += obstacle.speed * dt;
+          const nearestX = clamp(player.x, obstacle.x, obstacle.x + obstacle.width);
+          const nearestY = clamp(player.y, obstacle.y, obstacle.y + obstacle.height);
+          const dx = player.x - nearestX;
+          const dy = player.y - nearestY;
+          if (dx * dx + dy * dy < player.radius * player.radius * 0.72) {
+            burst(player.x, player.y, '#fff', 20);
+            finishGame();
+            return;
+          }
+          if (obstacle.y > height + obstacle.height) {
+            obstacles.splice(i, 1);
+            score += 1;
+            difficulty = 1 + score * 0.055;
+            if (score > best) {
+              best = score;
+              saveBestScore();
             }
-
-            // Update and draw obstacles
-            for (let i = obstacles.length - 1; i >= 0; i--) {
-                const obstacle = obstacles[i];
-                obstacle.y += obstacle.speed;
-
-                ctx.fillStyle = '#ff4444';
-                ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
-
-                // Check collision
-                if (player.x < obstacle.x + obstacle.width &&
-                    player.x + player.size > obstacle.x &&
-                    player.y < obstacle.y + obstacle.height &&
-                    player.y + player.size > obstacle.y) {
-                    endGame();
-                    return;
-                }
-
-                // Remove off-screen obstacles and increase score
-                if (obstacle.y > canvas.height) {
-                    obstacles.splice(i, 1);
-                    score++;
-                    if (score % 10 === 0) {
-                        difficulty += 0.2;
-                    }
-                }
-            }
-
-            // Draw score
-            ctx.fillStyle = '#000';
-            ctx.font = '20px Arial';
-            ctx.fillText(`Score: ${score}`, 10, 30);
-
-            animationFrameId = requestAnimationFrame(gameLoop);
+            updateHud();
+            burst(obstacle.x + obstacle.width / 2, height - 4, '#ffffff', 5);
+            if (score % 5 === 0) playTone(660 + Math.min(score, 20) * 12, 0.11, 'sine', 0.025);
+          }
         }
 
-        // Controls
-        function handleKeyDown(e) {
-            if (!gameRunning) return;
-            
-            if (e.key === 'ArrowLeft' && player.x > 0) {
-                player.x -= player.speed;
-            } else if (e.key === 'ArrowRight' && player.x < canvas.width - player.size) {
-                player.x += player.speed;
-            }
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const particle = particles[i];
+          particle.life -= dt;
+          particle.x += particle.vx * dt;
+          particle.y += particle.vy * dt;
+          particle.vy += 90 * dt;
+          if (particle.life <= 0) particles.splice(i, 1);
+        }
+      }
+
+      function roundedRect(x, y, w, h, r) {
+        const radius = Math.min(r, w / 2, h / 2);
+        ctx.beginPath();
+        ctx.roundRect(x, y, w, h, radius);
+      }
+
+      function drawWater() {
+        const gradient = ctx.createLinearGradient(0, 0, 0, height);
+        gradient.addColorStop(0, '#d4f7ff');
+        gradient.addColorStop(0.56, '#8bd8ed');
+        gradient.addColorStop(1, '#45b9d1');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, width, height);
+
+        for (const wave of waves) {
+          const baseY = height * wave.y;
+          ctx.beginPath();
+          ctx.moveTo(0, baseY);
+          for (let x = 0; x <= width + 10; x += 10) {
+            const y = baseY + Math.sin(x * 0.018 + worldTime * wave.speed + wave.phase) * wave.amplitude;
+            ctx.lineTo(x, y);
+          }
+          ctx.lineTo(width, height);
+          ctx.lineTo(0, height);
+          ctx.closePath();
+          ctx.fillStyle = `rgba(255,255,255,${wave.alpha})`;
+          ctx.fill();
         }
 
-        function handleTouch(e) {
-            e.preventDefault();
-            if (!gameRunning) return;
-
-            const touch = e.touches[0];
-            const rect = canvas.getBoundingClientRect();
-            const touchX = touch.clientX - rect.left;
-            
-            if (touchX < canvas.width / 2) {
-                if (player.x > 0) player.x -= player.speed;
-            } else {
-                if (player.x < canvas.width - player.size) player.x += player.speed;
-            }
+        // Soft moving highlights make the background feel like sunlit water.
+        for (let i = 0; i < 9; i++) {
+          const x = ((i * 137 + worldTime * (18 + i * 2)) % (width + 80)) - 40;
+          const y = height * (0.12 + ((i * 31) % 70) / 100);
+          ctx.beginPath();
+          ctx.ellipse(x, y, 13 + (i % 3) * 5, 2, -0.15, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(255,255,255,.3)';
+          ctx.fill();
         }
+      }
 
-        // Event listeners
-        startBtn.addEventListener('click', startGame);
-        document.addEventListener('keydown', handleKeyDown);
-        canvas.addEventListener('touchstart', handleTouch, { passive: false });
-        canvas.addEventListener('touchmove', handleTouch, { passive: false });
-        window.addEventListener('resize', initGame);
-
-        // Initial setup
-        initGame();
-    </script>
-
-    <!-------------Sound Codes------>
-    
-    <!-- Add audio elements --
-    <audio id="startSound" src="start.mp3"></audio>
-    <audio id="collisionSound" src="collision.mp3"></audio>
-    <audio id="scoreSound" src="score.mp3"></audio>
-    <audio id="moveSound" src="move.mp3"></audio>
-
-                            -->
-
-    <script>
-        // ... existing code ...
-        
-        // Add sound variables
-        const startSound = document.getElementById('startSound');
-        const collisionSound = document.getElementById('collisionSound');
-        const scoreSound = document.getElementById('scoreSound');
-        const moveSound = document.getElementById('moveSound');
-
-        function startGame() {
-            startScreen.style.display = 'none';
-            gameRunning = true;
-            initGame();
-            startSound.play();  // Play start sound
-            gameLoop();
+      function drawObstacle(obstacle) {
+        ctx.save();
+        ctx.shadowColor = 'rgba(93, 52, 18, .2)';
+        ctx.shadowBlur = 8;
+        ctx.shadowOffsetY = 3;
+        const gradient = ctx.createLinearGradient(0, obstacle.y, 0, obstacle.y + obstacle.height);
+        gradient.addColorStop(0, `hsl(${obstacle.hue}, 72%, 56%)`);
+        gradient.addColorStop(1, `hsl(${obstacle.hue}, 65%, 37%)`);
+        ctx.fillStyle = gradient;
+        roundedRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height, obstacle.height / 2);
+        ctx.fill();
+        ctx.shadowColor = 'transparent';
+        ctx.strokeStyle = 'rgba(83, 47, 18, .3)';
+        ctx.lineWidth = 2;
+        for (let i = 1; i <= 2; i++) {
+          const knotX = obstacle.x + obstacle.width * i / 3;
+          ctx.beginPath();
+          ctx.ellipse(knotX, obstacle.y + obstacle.height / 2, obstacle.height * .22, obstacle.height * .34, 0, 0, Math.PI * 2);
+          ctx.stroke();
         }
+        ctx.restore();
+      }
 
-        function endGame() {
-            gameRunning = false;
-            cancelAnimationFrame(animationFrameId);
-            startScreen.style.display = 'flex';
-            collisionSound.play();  // Play collision sound
-            alert(`Game Over! Score: ${score}`);
-        }
+      function drawPlayer() {
+        const bob = state === 'playing' ? Math.sin(worldTime * 7) * 2 : Math.sin(worldTime * 2.4) * 3;
+        const y = player.y + bob;
+        ctx.save();
+        ctx.shadowColor = 'rgba(0, 85, 145, .3)';
+        ctx.shadowBlur = 13;
+        ctx.shadowOffsetY = 5;
+        const gradient = ctx.createRadialGradient(player.x - 5, y - 7, 2, player.x, y, player.radius * 1.2);
+        gradient.addColorStop(0, '#ffffff');
+        gradient.addColorStop(.24, '#8ce9ff');
+        gradient.addColorStop(1, '#087db5');
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.moveTo(player.x, y - player.radius);
+        ctx.bezierCurveTo(player.x + player.radius * .3, y - player.radius * .25, player.x + player.radius, y + player.radius * .2, player.x + player.radius * .72, y + player.radius * .68);
+        ctx.quadraticCurveTo(player.x, y + player.radius * 1.48, player.x - player.radius * .72, y + player.radius * .68);
+        ctx.bezierCurveTo(player.x - player.radius, y + player.radius * .2, player.x - player.radius * .3, y - player.radius * .25, player.x, y - player.radius);
+        ctx.fill();
+        ctx.restore();
+        ctx.beginPath();
+        ctx.ellipse(player.x - 4, y - 3, 3, 5, -.4, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,255,255,.85)';
+        ctx.fill();
+      }
 
-        // Update the obstacle removal section in gameLoop
-        // ... existing code ...
-                if (obstacle.y > canvas.height) {
-                    obstacles.splice(i, 1);
-                    score++;
-                    scoreSound.play();  // Play score sound
-                    if (score % 10 === 0) {
-                        difficulty += 0.2;
-                    }
-                }
-        // ... existing code ...
+      function drawParticles() {
+        for (const particle of particles) {
+          ctx.globalAlpha = clamp(particle.life / particle.maxLife, 0, 1);
+          ctx.fillStyle = particle.color;
+          ctx.beginPath();
+          ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+      }
 
-        // Update controls to include sound
-        function handleKeyDown(e) {
-            if (!gameRunning) return;
-            
-            if (e.key === 'ArrowLeft' && player.x > 0) {
-                player.x -= player.speed;
-                moveSound.play();  // Play move sound
-            } else if (e.key === 'ArrowRight' && player.x < canvas.width - player.size) {
-                player.x += player.speed;
-                moveSound.play();  // Play move sound
-            }
-        }
+      function render() {
+        drawWater();
+        for (const obstacle of obstacles) drawObstacle(obstacle);
+        drawPlayer();
+        drawParticles();
+      }
 
-        function handleTouch(e) {
-            e.preventDefault();
-            if (!gameRunning) return;
+      function frame(timestamp) {
+        const dt = lastTime ? Math.min((timestamp - lastTime) / 1000, 0.04) : 0;
+        lastTime = timestamp;
+        update(dt);
+        render();
+        requestAnimationFrame(frame);
+      }
 
-            const touch = e.touches[0];
-            const rect = canvas.getBoundingClientRect();
-            const touchX = touch.clientX - rect.left;
-            
-            if (touchX < canvas.width / 2) {
-                if (player.x > 0) {
-                    player.x -= player.speed;
-                    moveSound.play();  // Play move sound
-                }
-            } else {
-                if (player.x < canvas.width - player.size) {
-                    player.x += player.speed;
-                    moveSound.play();  // Play move sound
-                }
-            }
-        }
-        // ... existing code ...
-    </script>
+      function pointerPosition(event) {
+        const rect = canvas.getBoundingClientRect();
+        return (event.clientX - rect.left) * (width / rect.width);
+      }
 
-            <div>
-                
-    
-        <style>
-            /* Basic styling for the backlink */
-            .backlink {
-                text-align: center;
-                padding: 10px;
-                background-color: #f1f1f1;
-                border-top: 1px solid #ccc;
-                position: fixed;
-                bottom: 0;
-                width: 100%;
-                z-index: 1000; /* Ensure it stays on top */
-            }
-            .backlink a {
-                text-decoration: none;
-                color: #333;
-            }
-        </style>
-    
-    <script>
-        // Function to create and insert the backlink
-        function insertBacklink() {
-            if (!document.querySelector('.backlink')) {
-                // Create a new div element
-                var backlinkDiv = document.createElement('div');
-                backlinkDiv.className = 'backlink';
-    
-                // Create the anchor element
-                var backlinkAnchor = document.createElement('a');
-                backlinkAnchor.href = 'https://ghana-gpt.com';
-                backlinkAnchor.textContent = 'Powered By Ghana-GPT.com';
-    
-                // Append the anchor to the div
-                backlinkDiv.appendChild(backlinkAnchor);
-    
-                // Append the div to the body
-                document.body.appendChild(backlinkDiv);
-            }
-        }
-    
-        // Function to remove the backlink
-        function removeBacklink() {
-            var backlinkDiv = document.querySelector('.backlink');
-            if (backlinkDiv) {
-                backlinkDiv.remove();
-            }
-        }
-    
-        // Function to update the backlink text
-        function updateBacklinkText(newText) {
-            var backlinkAnchor = document.querySelector('.backlink a');
-            if (backlinkAnchor) {
-                backlinkAnchor.textContent = newText;
-            }
-        }
-    
-        // Function to ensure the backlink is always at the bottom
-        function ensureBacklinkAtBottom() {
-            var backlinkDiv = document.querySelector('.backlink');
-            if (backlinkDiv) {
-                document.body.appendChild(backlinkDiv);
-            }
-        }
-    
-        // Call the function to insert the backlink
-        insertBacklink();
-    
-        // Example usage of the additional functions
-        // Update the backlink text after 5 seconds
-        setTimeout(() => {
-            updateBacklinkText('Check out Ghana-GPT.COM');
-        }, 5000);
-    
-        // Ensure the backlink is always at the bottom after 10 seconds
-        setTimeout(() => {
-            ensureBacklinkAtBottom();
-        }, 100000);
-    
-        // Remove the backlink after 15 seconds
-        setTimeout(() => {
-            removeBacklink();
-        }, 15000);
-    </script>
-            </div>
+      canvas.addEventListener('pointerdown', (event) => {
+        if (state !== 'playing') return;
+        canvas.setPointerCapture?.(event.pointerId);
+        player.targetX = pointerPosition(event);
+      });
+      canvas.addEventListener('pointermove', (event) => {
+        if (state !== 'playing' || !(event.buttons || event.pointerType === 'touch')) return;
+        player.targetX = pointerPosition(event);
+      });
 
+      document.addEventListener('keydown', (event) => {
+        const key = event.key;
+        if (['ArrowLeft', 'ArrowRight', ' '].includes(key)) event.preventDefault();
+        if ((key === 'p' || key === 'P' || key === 'Escape') && !event.repeat) {
+          if (state === 'playing') pauseGame();
+          else if (state === 'paused') resumeGame();
+          return;
+        }
+        if (state === 'playing') keys.add(key);
+        if ((key === 'Enter' || key === ' ') && (state === 'menu' || state === 'gameover')) startGame();
+      });
+      document.addEventListener('keyup', (event) => keys.delete(event.key));
+      window.addEventListener('blur', () => { if (state === 'playing') pauseGame(); });
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden && state === 'playing') pauseGame();
+      });
+      startButton.addEventListener('click', startGame);
+      resumeButton.addEventListener('click', resumeGame);
+      pauseButton.addEventListener('click', () => state === 'playing' ? pauseGame() : resumeGame());
+      soundButton.addEventListener('click', () => {
+        soundEnabled = !soundEnabled;
+        setSoundButton();
+        if (soundEnabled) playTone(520, 0.1, 'sine', 0.03);
+      });
+      window.addEventListener('resize', resizeCanvas);
+
+      if (reducedMotion) {
+        for (const wave of waves) wave.speed *= 0.35;
+      }
+      setSoundButton();
+      updateHud();
+      resizeCanvas();
+      requestAnimationFrame(frame);
+    })();
+  </script>
 </body>
 </html>
