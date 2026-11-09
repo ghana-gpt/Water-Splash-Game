@@ -51,3 +51,6 @@ Because the game uses relative asset paths and has no build step, it can be serv
 - `styles.css` — layout, visual design, and animations
 - `game.js` — gameplay, rendering, controls, effects, and local leaderboard
 - `LICENSE` — project license
+
+## Live Github Page
+https://ghana-gpt.github.io/Water-Splash-Game/
