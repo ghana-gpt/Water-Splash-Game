@@ -10,27 +10,31 @@
   --ink: #123047;
   --muted: #456477;
   --white-glass: rgba(255, 255, 255, .92);
+  --shadow: rgba(7, 62, 90, .22);
 }
 
 * {
   box-sizing: border-box;
 }
 
+html, body {
+  margin: 0;
+  min-height: 100%;
+  min-height: 100svh;
+}
+
 body {
   min-width: 320px;
-  min-height: 100vh;
-  min-height: 100svh;
-  margin: 0;
   padding: 16px;
   display: grid;
   place-items: center;
+  color: var(--ink);
   background:
     radial-gradient(ellipse at 18% 20%, rgba(255, 255, 255, .8), transparent 34%),
     linear-gradient(145deg, #e2fbff, #78cce9 56%, #a7e8e4);
 }
 
-button,
-input {
+button, input {
   font: inherit;
 }
 
@@ -58,7 +62,7 @@ input:focus-visible {
   border: 1px solid rgba(255, 255, 255, .85);
   border-radius: 24px;
   background: #a7e6f4;
-  box-shadow: 0 22px 60px rgba(7, 62, 90, .22);
+  box-shadow: 0 22px 60px var(--shadow);
 }
 
 #game-canvas {
@@ -170,8 +174,7 @@ input:focus-visible {
   text-transform: uppercase;
 }
 
-h1,
-h2 {
+h1, h2 {
   margin: 0 0 12px;
   color: var(--blue-dark);
   line-height: 1.05;
