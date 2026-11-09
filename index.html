@@ -1,29 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Play Water Splash, dodge floating logs, build your score, and try to beat your best run.">
-  <meta name="theme-color" content="#087db5">
-  <meta name="author" content="Imoro Abubakari">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Water Splash is a colorful arcade browser game where you dodge falling obstacles and chase your best score." />
+  <meta name="theme-color" content="#087db5" />
+  <meta name="author" content="Imoro Abubakari" />
   <title>Water Splash</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css" />
   <script src="game.js" defer></script>
 </head>
 <body>
   <main class="app">
     <section class="game-shell" id="game-shell" aria-label="Water Splash game">
-      <canvas
-        id="game-canvas"
-        aria-label="Game area. Move the blue water drop to dodge falling logs."
-      ></canvas>
+      <canvas id="game-canvas" aria-label="Game area for Water Splash"></canvas>
 
-      <header class="hud" aria-label="Game status and controls">
+      <header class="hud" aria-label="Score and controls">
         <div class="hud-group">
           <div class="badge" id="score-label" aria-live="polite">Score: 0</div>
           <div class="badge" id="level-label">Level: 1</div>
           <div class="badge best-badge" id="best-label">Best: 0</div>
         </div>
+
         <div class="hud-group">
           <button class="hud-button" id="sound-button" type="button" aria-pressed="true">
             Sound on
@@ -42,10 +40,12 @@
           <p class="subtitle" id="menu-message">
             Dodge the floating logs, make a splash, and see how long you can stay afloat.
           </p>
+
           <div class="button-row">
             <button class="primary-button" id="start-button" type="button">Start game</button>
             <button class="secondary-button" id="menu-scores-button" type="button">Leaderboard</button>
           </div>
+
           <p class="help">
             Move with <kbd>←</kbd> <kbd>→</kbd> or <kbd>A</kbd> <kbd>D</kbd>.
             On touchscreens, tap or drag to steer. Press <kbd>P</kbd> or <kbd>Esc</kbd> to pause.
@@ -58,10 +58,12 @@
           <p class="eyebrow">Take a breather</p>
           <h2 id="pause-title">Paused</h2>
           <p class="subtitle">The water will wait.</p>
+
           <div class="button-row">
             <button class="primary-button" id="resume-button" type="button">Resume</button>
             <button class="secondary-button" id="pause-restart-button" type="button">Restart</button>
           </div>
+
           <p class="help">Press <kbd>P</kbd> or <kbd>Esc</kbd> to resume.</p>
         </div>
       </section>
@@ -84,7 +86,7 @@
                 autocomplete="nickname"
                 value="Player"
                 required
-              >
+              />
               <button class="primary-button" type="submit">Save score</button>
             </div>
             <p class="form-status" id="save-status" aria-live="polite"></p>
@@ -103,7 +105,10 @@
           <h2 id="leaderboard-title">Leaderboard</h2>
           <p class="subtitle">Scores are saved on this device in this browser.</p>
           <ol class="leaderboard-list" id="leaderboard-list"></ol>
-          <p class="empty-leaderboard" id="empty-leaderboard">No saved scores yet. Play a game and save your run!</p>
+          <p class="empty-leaderboard" id="empty-leaderboard">
+            No saved scores yet. Play a game and save your run!
+          </p>
+
           <button class="secondary-button" id="leaderboard-back-button" type="button">Back</button>
         </div>
       </section>
