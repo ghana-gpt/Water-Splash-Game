@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Water Splash is a colorful arcade browser game where you dodge falling obstacles and chase your best score." />
+  <meta name="description" content="Water Splash is a browser arcade game where you dodge floating obstacles and chase your best score." />
   <meta name="theme-color" content="#087db5" />
   <meta name="author" content="Imoro Abubakari" />
   <title>Water Splash</title>
@@ -13,9 +13,9 @@
 <body>
   <main class="app">
     <section class="game-shell" id="game-shell" aria-label="Water Splash game">
-      <canvas id="game-canvas" aria-label="Game area for Water Splash"></canvas>
+      <canvas id="game-canvas" aria-label="Game area"></canvas>
 
-      <header class="hud" aria-label="Score and controls">
+      <header class="hud" aria-label="Game status">
         <div class="hud-group">
           <div class="badge" id="score-label" aria-live="polite">Score: 0</div>
           <div class="badge" id="level-label">Level: 1</div>
@@ -23,12 +23,8 @@
         </div>
 
         <div class="hud-group">
-          <button class="hud-button" id="sound-button" type="button" aria-pressed="true">
-            Sound on
-          </button>
-          <button class="hud-button" id="pause-button" type="button" hidden>
-            Pause
-          </button>
+          <button class="hud-button" id="sound-button" type="button" aria-pressed="true">Sound on</button>
+          <button class="hud-button" id="pause-button" type="button" hidden>Pause</button>
         </div>
       </header>
 
@@ -48,7 +44,8 @@
 
           <p class="help">
             Move with <kbd>←</kbd> <kbd>→</kbd> or <kbd>A</kbd> <kbd>D</kbd>.
-            On touchscreens, tap or drag to steer. Press <kbd>P</kbd> or <kbd>Esc</kbd> to pause.
+            On touchscreens, tap or drag to steer.
+            Press <kbd>P</kbd> or <kbd>Esc</kbd> to pause.
           </p>
         </div>
       </section>
@@ -76,7 +73,7 @@
           <p class="result-best" id="final-best">Best score: 0</p>
 
           <form id="score-form" class="score-form">
-            <label for="player-name">Save your score to this browser’s leaderboard</label>
+            <label for="player-name">Save your score to this browser leaderboard</label>
             <div class="name-row">
               <input
                 id="player-name"
@@ -104,6 +101,7 @@
           <p class="eyebrow">Your top runs</p>
           <h2 id="leaderboard-title">Leaderboard</h2>
           <p class="subtitle">Scores are saved on this device in this browser.</p>
+
           <ol class="leaderboard-list" id="leaderboard-list"></ol>
           <p class="empty-leaderboard" id="empty-leaderboard">
             No saved scores yet. Play a game and save your run!
