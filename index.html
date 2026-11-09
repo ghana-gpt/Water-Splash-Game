@@ -1,444 +1,454 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="WaterSplash is an interactive web-based game developed using HTML5, CSS3, and JavaScript. Avoid obstacles and score as high as you can!">
-    <meta name="keywords" content="game development, HTML5 game, Water Splash game,JavaScript game, canvas game, web game, interactive game, browser game, HTML5 canvas game, JavaScript canvas game, HTML game development, web-based game, responsive game, touch controls, arcade game, simple game, educational game, fun game, HTML5 canvas animation, JavaScript animation">
-    <meta name="author" content="Mr. Imoro Abubakari">
-    <title>Water Splash | Powered by Ghana-gpt.com</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Water Splash is an interactive web-based game built with HTML5, CSS3, and JavaScript." />
+  <meta name="author" content="Imoro Abubakari" />
+  <title>Water Splash | Ghana-GPT</title>
+  <style>
+    :root {
+      --sky-top: #dff7ff;
+      --sky-bottom: #87ceeb;
+      --panel: rgba(255, 255, 255, 0.92);
+      --primary: #1e90ff;
+      --primary-dark: #0d6ed1;
+      --danger: #ff4c4c;
+      --text: #123;
+      --shadow: rgba(0, 0, 0, 0.15);
+    }
 
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(to bottom, #e0f7ff, #87ceeb);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            touch-action: none;
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-        #game-container {
-            position: relative;
-            width: 90vw;
-            max-width: 800px;
-            height: 80vh;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-        }
+    html, body {
+      height: 100%;
+    }
 
-        #start-screen {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.9);
-            z-index: 10;
-        }
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom, var(--sky-top), var(--sky-bottom));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text);
+      overflow: hidden;
+    }
 
-        h1 {
-            color: #1e90ff;
-            font-size: 3em;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-        }
+    .page {
+      width: min(92vw, 820px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
 
-        #start-btn {
-            padding: 15px 30px;
-            font-size: 1.2em;
-            background: #1e90ff;
-            color: white;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: transform 0.2s;
-            -webkit-tap-highlight-color: transparent;
-        }
+    #game-container {
+      position: relative;
+      width: 100%;
+      height: 75vh;
+      min-height: 360px;
+      max-height: 700px;
+      background: var(--panel);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 12px 30px var(--shadow);
+    }
 
-        #start-btn:hover {
-            transform: scale(1.1);
-        }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to bottom, #dff7ff 0%, #bfe9ff 40%, #d7f5ff 100%);
+      touch-action: none;
+    }
 
-        #game-canvas {
-            width: 100%;
-            height: 100%;
-            touch-action: none;
-        }
-        .copyright{
-            margin: 5px 5px;
-            box-shadow: 5px 5px red;
-            border-radius: 30%;
-            color: rgb(0, 0, 0);
-            text-align: center;
-            
-        }
-        .copyright a{
-            text-decoration: none;
+    .overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.78);
+      z-index: 10;
+    }
 
-        }
-        .copyright  a:hover{
-            font-weight: 50px;
-            font-size: 20px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+    .overlay.hidden {
+      display: none;
+    }
 
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2em;
-            }
-            
-            #start-btn {
-                padding: 12px 24px;
-                font-size: 1em;
-            }
-        }
-    </style>
+    .panel {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 18px;
+      padding: 28px 32px;
+      text-align: center;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    }
+
+    h1 {
+      font-size: clamp(2.1rem, 4vw, 3.2rem);
+      color: var(--primary);
+      margin-bottom: 16px;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.08);
+    }
+
+    .lead {
+      font-size: 1rem;
+      margin-bottom: 18px;
+      color: rgba(17, 34, 51, 0.9);
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 14px 24px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      background: var(--primary);
+      color: white;
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    button:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .score-badge {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      z-index: 5;
+      background: rgba(255,255,255,0.85);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    }
+
+    .copyright {
+      text-align: center;
+      font-size: 0.95rem;
+      padding: 6px 10px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.5);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+    }
+
+    .copyright a {
+      color: #0d3b6d;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .copyright a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 640px) {
+      #game-container {
+        height: 68vh;
+      }
+
+      .panel {
+        padding: 22px 20px;
+      }
+    }
+  </style>
 </head>
 <body>
+  <div class="page">
     <div id="game-container">
-        <div id="start-screen">
-            <h1>Water Splash</h1>
-            <button id="start-btn">Start Game</button>
-            
+      <div class="score-badge" id="score-badge">Score: 0</div>
+
+      <div id="start-screen" class="overlay">
+        <div class="panel">
+          <h1>Water Splash</h1>
+          <p class="lead">Move left and right to dodge the obstacles and survive as long as you can.</p>
+          <button id="start-btn">Start Game</button>
         </div>
-        <canvas id="game-canvas"></canvas>
-    </div>
-    <div  class="copyright">
-        <p>Water Splash Game &copy; 2025. | Design by 
-            <a href="https://ghana-gpt.com">
-                ghana-gpt.com
-            </a>
-        </p>
+      </div>
+
+      <div id="game-over-screen" class="overlay hidden">
+        <div class="panel">
+          <h1>Game Over</h1>
+          <p class="lead" id="final-score">Score: 0</p>
+          <p class="lead" id="best-score">Best: 0</p>
+          <button id="restart-btn">Play Again</button>
+        </div>
+      </div>
+
+      <canvas id="game-canvas" aria-label="Water Splash game area"></canvas>
     </div>
 
-    <script>
-        const gameContainer = document.getElementById('game-container');
-        const startScreen = document.getElementById('start-screen');
-        const startBtn = document.getElementById('start-btn');
-        const canvas = document.getElementById('game-canvas');
-        const ctx = canvas.getContext('2d');
+    <div class="copyright">
+      <p>Water Splash Game &copy; 2026 | Design by <a href="https://ghana-gpt.com">ghana-gpt.com</a></p>
+    </div>
+  </div>
 
-        let gameRunning = false;
-        let animationFrameId;
-        
-        const player = {
-            x: 0,
-            y: 0,
-            size: 30,
-            speed: 5
+  <script>
+    const canvas = document.getElementById('game-canvas');
+    const ctx = canvas.getContext('2d');
+
+    const gameContainer = document.getElementById('game-container');
+    const startScreen = document.getElementById('start-screen');
+    const gameOverScreen = document.getElementById('game-over-screen');
+    const startBtn = document.getElementById('start-btn');
+    const restartBtn = document.getElementById('restart-btn');
+    const scoreBadge = document.getElementById('score-badge');
+    const finalScore = document.getElementById('final-score');
+    const bestScoreEl = document.getElementById('best-score');
+
+    const STORAGE_KEY = 'water-splash-best-score';
+
+    let gameRunning = false;
+    let animationFrameId = null;
+    let lastTimestamp = 0;
+    let spawnTimer = 0;
+    let score = 0;
+    let difficulty = 1;
+    let bestScore = Number(localStorage.getItem(STORAGE_KEY)) || 0;
+
+    const player = {
+      x: 0,
+      y: 0,
+      size: 30,
+      speed: 320,
+      color: '#1e90ff'
+    };
+
+    const obstacles = [];
+
+    function resizeCanvas() {
+      const rect = gameContainer.getBoundingClientRect();
+      canvas.width = Math.max(300, rect.width);
+      canvas.height = Math.max(250, rect.height);
+
+      if (!gameRunning) {
+        player.x = canvas.width / 2 - player.size / 2;
+        player.y = canvas.height - player.size * 2;
+      }
+    }
+
+    function resetGame() {
+      obstacles.length = 0;
+      score = 0;
+      difficulty = 1;
+      spawnTimer = 0;
+      player.x = canvas.width / 2 - player.size / 2;
+      player.y = canvas.height - player.size * 2;
+      scoreBadge.textContent = `Score: ${score}`;
+    }
+
+    function showStartScreen() {
+      gameOverScreen.classList.add('hidden');
+      startScreen.classList.remove('hidden');
+    }
+
+    function hideStartScreen() {
+      startScreen.classList.add('hidden');
+      gameOverScreen.classList.add('hidden');
+    }
+
+    function updateBestScoreDisplay() {
+      bestScoreEl.textContent = `Best: ${bestScore}`;
+    }
+
+    function startGame() {
+      hideStartScreen();
+      resetGame();
+      gameRunning = true;
+      lastTimestamp = 0;
+      animationFrameId = requestAnimationFrame(gameLoop);
+    }
+
+    function endGame() {
+      gameRunning = false;
+      cancelAnimationFrame(animationFrameId);
+
+      if (score > bestScore) {
+        bestScore = score;
+        localStorage.setItem(STORAGE_KEY, String(bestScore));
+      }
+
+      finalScore.textContent = `Score: ${score}`;
+      updateBestScoreDisplay();
+      gameOverScreen.classList.remove('hidden');
+    }
+
+    function createObstacle() {
+      const width = 40 + Math.random() * 80;
+      const height = 18;
+
+      obstacles.push({
+        x: Math.random() * (canvas.width - width),
+        y: -height - 10,
+        width,
+        height,
+        speed: 180 + difficulty * 30
+      });
+    }
+
+    function update(dt) {
+      if (!gameRunning) return;
+
+      if (spawnTimer <= 0) {
+        createObstacle();
+        spawnTimer = Math.max(0.45, 1.1 - difficulty * 0.08) + Math.random() * 0.5;
+      } else {
+        spawnTimer -= dt;
+      }
+
+      for (let i = obstacles.length - 1; i >= 0; i--) {
+        const obstacle = obstacles[i];
+        obstacle.y += obstacle.speed * dt;
+
+        const playerBounds = {
+          left: player.x,
+          right: player.x + player.size,
+          top: player.y,
+          bottom: player.y + player.size
         };
 
-        const obstacles = [];
-        let score = 0;
-        let difficulty = 1;
+        const obstacleBounds = {
+          left: obstacle.x,
+          right: obstacle.x + obstacle.width,
+          top: obstacle.y,
+          bottom: obstacle.y + obstacle.height
+        };
 
-        function initGame() {
-            canvas.width = gameContainer.clientWidth;
-            canvas.height = gameContainer.clientHeight;
-            player.x = canvas.width / 2 - player.size / 2;
-            player.y = canvas.height - player.size * 2;
-            
-            // Reset game state
-            obstacles.length = 0;
-            score = 0;
-            difficulty = 1;
+        const colliding =
+          playerBounds.left < obstacleBounds.right &&
+          playerBounds.right > obstacleBounds.left &&
+          playerBounds.top < obstacleBounds.bottom &&
+          playerBounds.bottom > obstacleBounds.top;
+
+        if (colliding) {
+          endGame();
+          return;
         }
 
-        function createObstacle() {
-            const width = Math.random() * (100 - 30) + 30;
-            obstacles.push({
-                x: Math.random() * (canvas.width - width),
-                y: -50,
-                width: width,
-                height: 20,
-                speed: 2 + difficulty
-            });
+        if (obstacle.y > canvas.height) {
+          obstacles.splice(i, 1);
+          score += 1;
+          scoreBadge.textContent = `Score: ${score}`;
+          difficulty = 1 + score * 0.08;
         }
+      }
+    }
 
-        function startGame() {
-            startScreen.style.display = 'none';
-            gameRunning = true;
-            initGame();
-            gameLoop();
-        }
+    function drawPlayer() {
+      ctx.fillStyle = player.color;
+      ctx.beginPath();
+      ctx.arc(player.x + player.size / 2, player.y + player.size / 2, player.size / 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
 
-        function endGame() {
-            gameRunning = false;
-            cancelAnimationFrame(animationFrameId);
-            startScreen.style.display = 'flex';
-            alert(`Game Over! Score: ${score}`);
-        }
+    function drawObstacles() {
+      ctx.fillStyle = '#ff4c4c';
+      for (const obstacle of obstacles) {
+        ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+      }
+    }
 
-        function gameLoop() {
-            if (!gameRunning) return;
+    function drawScore() {
+      ctx.fillStyle = '#123';
+      ctx.font = '18px Arial';
+      ctx.fillText(`Score: ${score}`, 16, 28);
+    }
 
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+    function render() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Draw and update player
-            ctx.fillStyle = '#1e90ff';
-            ctx.beginPath();
-            ctx.arc(player.x + player.size/2, player.y + player.size/2, player.size/2, 0, Math.PI * 2);
-            ctx.fill();
+      drawObstacles();
+      drawPlayer();
+      drawScore();
+    }
 
-            // Create new obstacles
-            if (Math.random() < 0.02 * difficulty) {
-                createObstacle();
-            }
+    function gameLoop(timestamp) {
+      if (!gameRunning) return;
 
-            // Update and draw obstacles
-            for (let i = obstacles.length - 1; i >= 0; i--) {
-                const obstacle = obstacles[i];
-                obstacle.y += obstacle.speed;
+      if (!lastTimestamp) lastTimestamp = timestamp;
+      const dt = Math.min((timestamp - lastTimestamp) / 1000, 0.032);
+      lastTimestamp = timestamp;
 
-                ctx.fillStyle = '#ff4444';
-                ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+      update(dt);
+      render();
 
-                // Check collision
-                if (player.x < obstacle.x + obstacle.width &&
-                    player.x + player.size > obstacle.x &&
-                    player.y < obstacle.y + obstacle.height &&
-                    player.y + player.size > obstacle.y) {
-                    endGame();
-                    return;
-                }
+      if (gameRunning) {
+        animationFrameId = requestAnimationFrame(gameLoop);
+      }
+    }
 
-                // Remove off-screen obstacles and increase score
-                if (obstacle.y > canvas.height) {
-                    obstacles.splice(i, 1);
-                    score++;
-                    if (score % 10 === 0) {
-                        difficulty += 0.2;
-                    }
-                }
-            }
+    function handleMove(direction) {
+      if (!gameRunning) return;
 
-            // Draw score
-            ctx.fillStyle = '#000';
-            ctx.font = '20px Arial';
-            ctx.fillText(`Score: ${score}`, 10, 30);
+      const step = player.speed * (direction === 'left' ? -1 : 1);
 
-            animationFrameId = requestAnimationFrame(gameLoop);
-        }
+      player.x += step * (1 / 60);
 
-        // Controls
-        function handleKeyDown(e) {
-            if (!gameRunning) return;
-            
-            if (e.key === 'ArrowLeft' && player.x > 0) {
-                player.x -= player.speed;
-            } else if (e.key === 'ArrowRight' && player.x < canvas.width - player.size) {
-                player.x += player.speed;
-            }
-        }
+      player.x = Math.max(0, Math.min(canvas.width - player.size, player.x));
+    }
 
-        function handleTouch(e) {
-            e.preventDefault();
-            if (!gameRunning) return;
+    function handleKeyDown(event) {
+      if (event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a') {
+        event.preventDefault();
+        handleMove('left');
+      } else if (event.key === 'ArrowRight' || event.key.toLowerCase() === 'd') {
+        event.preventDefault();
+        handleMove('right');
+      }
+    }
 
-            const touch = e.touches[0];
-            const rect = canvas.getBoundingClientRect();
-            const touchX = touch.clientX - rect.left;
-            
-            if (touchX < canvas.width / 2) {
-                if (player.x > 0) player.x -= player.speed;
-            } else {
-                if (player.x < canvas.width - player.size) player.x += player.speed;
-            }
-        }
+    function handlePointerMove(event) {
+      if (!gameRunning) return;
 
-        // Event listeners
-        startBtn.addEventListener('click', startGame);
-        document.addEventListener('keydown', handleKeyDown);
-        canvas.addEventListener('touchstart', handleTouch, { passive: false });
-        canvas.addEventListener('touchmove', handleTouch, { passive: false });
-        window.addEventListener('resize', initGame);
+      const rect = canvas.getBoundingClientRect();
+      const pointerX = event.clientX - rect.left;
 
-        // Initial setup
-        initGame();
-    </script>
+      player.x = pointerX - player.size / 2;
+      player.x = Math.max(0, Math.min(canvas.width - player.size, player.x));
+    }
 
-    <!-------------Sound Codes------>
-    
-    <!-- Add audio elements --
-    <audio id="startSound" src="start.mp3"></audio>
-    <audio id="collisionSound" src="collision.mp3"></audio>
-    <audio id="scoreSound" src="score.mp3"></audio>
-    <audio id="moveSound" src="move.mp3"></audio>
+    function handleTouchMove(event) {
+      if (!gameRunning) return;
 
-                            -->
+      const touch = event.touches[0];
+      if (!touch) return;
 
-    <script>
-        // ... existing code ...
-        
-        // Add sound variables
-        const startSound = document.getElementById('startSound');
-        const collisionSound = document.getElementById('collisionSound');
-        const scoreSound = document.getElementById('scoreSound');
-        const moveSound = document.getElementById('moveSound');
+      const rect = canvas.getBoundingClientRect();
+      const touchX = touch.clientX - rect.left;
 
-        function startGame() {
-            startScreen.style.display = 'none';
-            gameRunning = true;
-            initGame();
-            startSound.play();  // Play start sound
-            gameLoop();
-        }
+      player.x = touchX - player.size / 2;
+      player.x = Math.max(0, Math.min(canvas.width - player.size, player.x));
+    }
 
-        function endGame() {
-            gameRunning = false;
-            cancelAnimationFrame(animationFrameId);
-            startScreen.style.display = 'flex';
-            collisionSound.play();  // Play collision sound
-            alert(`Game Over! Score: ${score}`);
-        }
+    startBtn.addEventListener('click', startGame);
+    restartBtn.addEventListener('click', startGame);
 
-        // Update the obstacle removal section in gameLoop
-        // ... existing code ...
-                if (obstacle.y > canvas.height) {
-                    obstacles.splice(i, 1);
-                    score++;
-                    scoreSound.play();  // Play score sound
-                    if (score % 10 === 0) {
-                        difficulty += 0.2;
-                    }
-                }
-        // ... existing code ...
+    document.addEventListener('keydown', handleKeyDown);
+    canvas.addEventListener('pointermove', handlePointerMove);
+    canvas.addEventListener('touchmove', handleTouchMove, { passive: true });
 
-        // Update controls to include sound
-        function handleKeyDown(e) {
-            if (!gameRunning) return;
-            
-            if (e.key === 'ArrowLeft' && player.x > 0) {
-                player.x -= player.speed;
-                moveSound.play();  // Play move sound
-            } else if (e.key === 'ArrowRight' && player.x < canvas.width - player.size) {
-                player.x += player.speed;
-                moveSound.play();  // Play move sound
-            }
-        }
+    window.addEventListener('resize', resizeCanvas);
 
-        function handleTouch(e) {
-            e.preventDefault();
-            if (!gameRunning) return;
-
-            const touch = e.touches[0];
-            const rect = canvas.getBoundingClientRect();
-            const touchX = touch.clientX - rect.left;
-            
-            if (touchX < canvas.width / 2) {
-                if (player.x > 0) {
-                    player.x -= player.speed;
-                    moveSound.play();  // Play move sound
-                }
-            } else {
-                if (player.x < canvas.width - player.size) {
-                    player.x += player.speed;
-                    moveSound.play();  // Play move sound
-                }
-            }
-        }
-        // ... existing code ...
-    </script>
-
-            <div>
-                
-    
-        <style>
-            /* Basic styling for the backlink */
-            .backlink {
-                text-align: center;
-                padding: 10px;
-                background-color: #f1f1f1;
-                border-top: 1px solid #ccc;
-                position: fixed;
-                bottom: 0;
-                width: 100%;
-                z-index: 1000; /* Ensure it stays on top */
-            }
-            .backlink a {
-                text-decoration: none;
-                color: #333;
-            }
-        </style>
-    
-    <script>
-        // Function to create and insert the backlink
-        function insertBacklink() {
-            if (!document.querySelector('.backlink')) {
-                // Create a new div element
-                var backlinkDiv = document.createElement('div');
-                backlinkDiv.className = 'backlink';
-    
-                // Create the anchor element
-                var backlinkAnchor = document.createElement('a');
-                backlinkAnchor.href = 'https://ghana-gpt.com';
-                backlinkAnchor.textContent = 'Powered By Ghana-GPT.com';
-    
-                // Append the anchor to the div
-                backlinkDiv.appendChild(backlinkAnchor);
-    
-                // Append the div to the body
-                document.body.appendChild(backlinkDiv);
-            }
-        }
-    
-        // Function to remove the backlink
-        function removeBacklink() {
-            var backlinkDiv = document.querySelector('.backlink');
-            if (backlinkDiv) {
-                backlinkDiv.remove();
-            }
-        }
-    
-        // Function to update the backlink text
-        function updateBacklinkText(newText) {
-            var backlinkAnchor = document.querySelector('.backlink a');
-            if (backlinkAnchor) {
-                backlinkAnchor.textContent = newText;
-            }
-        }
-    
-        // Function to ensure the backlink is always at the bottom
-        function ensureBacklinkAtBottom() {
-            var backlinkDiv = document.querySelector('.backlink');
-            if (backlinkDiv) {
-                document.body.appendChild(backlinkDiv);
-            }
-        }
-    
-        // Call the function to insert the backlink
-        insertBacklink();
-    
-        // Example usage of the additional functions
-        // Update the backlink text after 5 seconds
-        setTimeout(() => {
-            updateBacklinkText('Check out Ghana-GPT.COM');
-        }, 5000);
-    
-        // Ensure the backlink is always at the bottom after 10 seconds
-        setTimeout(() => {
-            ensureBacklinkAtBottom();
-        }, 100000);
-    
-        // Remove the backlink after 15 seconds
-        setTimeout(() => {
-            removeBacklink();
-        }, 15000);
-    </script>
-            </div>
-
+    bestScore = Number(localStorage.getItem(STORAGE_KEY)) || 0;
+    updateBestScoreDisplay();
+    resizeCanvas();
+    resetGame();
+    showStartScreen();
+  </script>
 </body>
 </html>
