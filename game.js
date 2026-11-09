@@ -124,7 +124,6 @@
     const localBest = loadBestScore();
     const leaderboardBest = savedScores.reduce((highest, entry) => Math.max(highest, entry.score), 0);
     bestScore = Math.max(localBest, leaderboardBest, 0);
-
     elements.best.textContent = `Best: ${bestScore}`;
   }
 
@@ -164,7 +163,7 @@
       oscillator.start(now);
       oscillator.stop(now + duration);
     } catch {
-      // Audio is optional; gameplay should not fail if unavailable.
+      // Audio optional
     }
   }
 
@@ -204,17 +203,11 @@
     }
   }
 
-  function showOnly(overlayName) {
-    const overlays = [
-      elements.menu,
-      elements.pause,
-      elements.gameOver,
-      elements.leaderboard
-    ];
-
-    overlays.forEach((overlay) => {
-      overlay.hidden = overlayName !== overlay.id.replace('-overlay', '');
-    });
+  function showOnly(name) {
+    elements.menu.hidden = name !== 'menu';
+    elements.pause.hidden = name !== 'pause';
+    elements.gameOver.hidden = name !== 'gameOver';
+    elements.leaderboard.hidden = name !== 'leaderboard';
   }
 
   function startGame() {
@@ -233,8 +226,7 @@
     player.targetX = null;
 
     elements.menuTitle.textContent = 'Water Splash';
-    elements.menuMessage.textContent =
-      'Dodge the floating logs, make a splash, and see how long you can stay afloat.';
+    elements.menuMessage.textContent = 'Dodge the floating logs, make a splash, and see how long you can stay afloat.';
     elements.start.textContent = 'Start game';
     elements.saveStatus.textContent = '';
     elements.pauseButton.hidden = false;
@@ -347,7 +339,7 @@
   }
 
   function awardPoints(points) {
-    const prevLevel = level;
+    const previousLevel = level;
     score += points;
     level = Math.floor(score / 10) + 1;
     updateHud();
@@ -358,7 +350,7 @@
       elements.best.textContent = `Best: ${bestScore}`;
     }
 
-    if (level > prevLevel) {
+    if (level > previousLevel) {
       addFloatingText(width / 2, height * 0.3, `LEVEL ${level}!`);
       playTone(740, 0.18, 'triangle', 0.035);
     }
@@ -370,7 +362,6 @@
     if (state !== 'playing') return;
 
     let direction = 0;
-
     if (keysDown.has('ArrowLeft') || keysDown.has('a') || keysDown.has('A')) direction -= 1;
     if (keysDown.has('ArrowRight') || keysDown.has('d') || keysDown.has('D')) direction += 1;
 
@@ -684,7 +675,6 @@
     }
   }
 
-  // Events
   elements.start.addEventListener('click', startGame);
   elements.resume.addEventListener('click', resumeGame);
   elements.pauseRestart.addEventListener('click', startGame);
@@ -764,18 +754,25 @@
   }, { passive: true });
 
   document.addEventListener('keydown', (event) => {
+    const target = event.target;
+
+    if (
+      target instanceof HTMLElement &&
+      (target.isContentEditable ||
+        ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName))
+    ) {
+      return;
+    }
+
     const key = event.key;
 
-    if (['ArrowLeft','ArrowRight',' '].includes(key)) {
+    if (['ArrowLeft', 'ArrowRight', ' '].includes(key)) {
       event.preventDefault();
     }
 
     if ((key === 'p' || key === 'P' || key === 'Escape') && !event.repeat) {
-      if (state === 'playing') {
-        pauseGame();
-      } else if (state === 'paused') {
-        resumeGame();
-      }
+      if (state === 'playing') pauseGame();
+      else if (state === 'paused') resumeGame();
       return;
     }
 
