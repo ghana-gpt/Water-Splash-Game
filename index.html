@@ -1,454 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Water Splash is an interactive web-based game built with HTML5, CSS3, and JavaScript." />
-  <meta name="author" content="Imoro Abubakari" />
-  <title>Water Splash | Ghana-GPT</title>
-  <style>
-    :root {
-      --sky-top: #dff7ff;
-      --sky-bottom: #87ceeb;
-      --panel: rgba(255, 255, 255, 0.92);
-      --primary: #1e90ff;
-      --primary-dark: #0d6ed1;
-      --danger: #ff4c4c;
-      --text: #123;
-      --shadow: rgba(0, 0, 0, 0.15);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html, body {
-      height: 100%;
-    }
-
-    body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(to bottom, var(--sky-top), var(--sky-bottom));
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: var(--text);
-      overflow: hidden;
-    }
-
-    .page {
-      width: min(92vw, 820px);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-    }
-
-    #game-container {
-      position: relative;
-      width: 100%;
-      height: 75vh;
-      min-height: 360px;
-      max-height: 700px;
-      background: var(--panel);
-      border-radius: 18px;
-      overflow: hidden;
-      box-shadow: 0 12px 30px var(--shadow);
-    }
-
-    canvas {
-      display: block;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(to bottom, #dff7ff 0%, #bfe9ff 40%, #d7f5ff 100%);
-      touch-action: none;
-    }
-
-    .overlay {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(255, 255, 255, 0.78);
-      z-index: 10;
-    }
-
-    .overlay.hidden {
-      display: none;
-    }
-
-    .panel {
-      background: rgba(255, 255, 255, 0.9);
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      border-radius: 18px;
-      padding: 28px 32px;
-      text-align: center;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-    }
-
-    h1 {
-      font-size: clamp(2.1rem, 4vw, 3.2rem);
-      color: var(--primary);
-      margin-bottom: 16px;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.08);
-    }
-
-    .lead {
-      font-size: 1rem;
-      margin-bottom: 18px;
-      color: rgba(17, 34, 51, 0.9);
-    }
-
-    button {
-      border: none;
-      border-radius: 999px;
-      padding: 14px 24px;
-      font-size: 1.05rem;
-      font-weight: 600;
-      background: var(--primary);
-      color: white;
-      cursor: pointer;
-      transition: transform 0.2s ease, background 0.2s ease;
-    }
-
-    button:hover {
-      background: var(--primary-dark);
-      transform: translateY(-1px);
-    }
-
-    button:active {
-      transform: translateY(0);
-    }
-
-    .score-badge {
-      position: absolute;
-      top: 14px;
-      left: 14px;
-      z-index: 5;
-      background: rgba(255,255,255,0.85);
-      color: var(--text);
-      border-radius: 999px;
-      padding: 8px 12px;
-      font-weight: 700;
-      font-size: 0.95rem;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-    }
-
-    .copyright {
-      text-align: center;
-      font-size: 0.95rem;
-      padding: 6px 10px;
-      border-radius: 10px;
-      background: rgba(255,255,255,0.5);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.06);
-    }
-
-    .copyright a {
-      color: #0d3b6d;
-      text-decoration: none;
-      font-weight: 600;
-    }
-
-    .copyright a:hover {
-      text-decoration: underline;
-    }
-
-    @media (max-width: 640px) {
-      #game-container {
-        height: 68vh;
-      }
-
-      .panel {
-        padding: 22px 20px;
-      }
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Play Water Splash, dodge floating logs, build your score, and try to beat your best run.">
+  <meta name="theme-color" content="#087db5">
+  <meta name="author" content="Imoro Abubakari">
+  <title>Water Splash</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="game.js" defer></script>
 </head>
 <body>
-  <div class="page">
-    <div id="game-container">
-      <div class="score-badge" id="score-badge">Score: 0</div>
+  <main class="app">
+    <section class="game-shell" id="game-shell" aria-label="Water Splash game">
+      <canvas
+        id="game-canvas"
+        aria-label="Game area. Move the blue water drop to dodge falling logs."
+      ></canvas>
 
-      <div id="start-screen" class="overlay">
-        <div class="panel">
-          <h1>Water Splash</h1>
-          <p class="lead">Move left and right to dodge the obstacles and survive as long as you can.</p>
-          <button id="start-btn">Start Game</button>
+      <header class="hud" aria-label="Game status and controls">
+        <div class="hud-group">
+          <div class="badge" id="score-label" aria-live="polite">Score: 0</div>
+          <div class="badge" id="level-label">Level: 1</div>
+          <div class="badge best-badge" id="best-label">Best: 0</div>
         </div>
-      </div>
-
-      <div id="game-over-screen" class="overlay hidden">
-        <div class="panel">
-          <h1>Game Over</h1>
-          <p class="lead" id="final-score">Score: 0</p>
-          <p class="lead" id="best-score">Best: 0</p>
-          <button id="restart-btn">Play Again</button>
+        <div class="hud-group">
+          <button class="hud-button" id="sound-button" type="button" aria-pressed="true">
+            Sound on
+          </button>
+          <button class="hud-button" id="pause-button" type="button" hidden>
+            Pause
+          </button>
         </div>
-      </div>
+      </header>
 
-      <canvas id="game-canvas" aria-label="Water Splash game area"></canvas>
-    </div>
+      <section class="overlay" id="menu-overlay" aria-labelledby="menu-title">
+        <div class="dialog title-dialog">
+          <div class="title-mark" aria-hidden="true">💧</div>
+          <p class="eyebrow">A tiny arcade challenge</p>
+          <h1 id="menu-title">Water Splash</h1>
+          <p class="subtitle" id="menu-message">
+            Dodge the floating logs, make a splash, and see how long you can stay afloat.
+          </p>
+          <div class="button-row">
+            <button class="primary-button" id="start-button" type="button">Start game</button>
+            <button class="secondary-button" id="menu-scores-button" type="button">Leaderboard</button>
+          </div>
+          <p class="help">
+            Move with <kbd>←</kbd> <kbd>→</kbd> or <kbd>A</kbd> <kbd>D</kbd>.
+            On touchscreens, tap or drag to steer. Press <kbd>P</kbd> or <kbd>Esc</kbd> to pause.
+          </p>
+        </div>
+      </section>
 
-    <div class="copyright">
-      <p>Water Splash Game &copy; 2026 | Design by <a href="https://ghana-gpt.com">ghana-gpt.com</a></p>
-    </div>
-  </div>
+      <section class="overlay" id="pause-overlay" aria-labelledby="pause-title" hidden>
+        <div class="dialog">
+          <p class="eyebrow">Take a breather</p>
+          <h2 id="pause-title">Paused</h2>
+          <p class="subtitle">The water will wait.</p>
+          <div class="button-row">
+            <button class="primary-button" id="resume-button" type="button">Resume</button>
+            <button class="secondary-button" id="pause-restart-button" type="button">Restart</button>
+          </div>
+          <p class="help">Press <kbd>P</kbd> or <kbd>Esc</kbd> to resume.</p>
+        </div>
+      </section>
 
-  <script>
-    const canvas = document.getElementById('game-canvas');
-    const ctx = canvas.getContext('2d');
+      <section class="overlay" id="game-over-overlay" aria-labelledby="game-over-title" hidden>
+        <div class="dialog result-dialog">
+          <p class="eyebrow">Run complete</p>
+          <h2 id="game-over-title">Game over</h2>
+          <p class="subtitle" id="final-score">Score: 0</p>
+          <p class="result-best" id="final-best">Best score: 0</p>
 
-    const gameContainer = document.getElementById('game-container');
-    const startScreen = document.getElementById('start-screen');
-    const gameOverScreen = document.getElementById('game-over-screen');
-    const startBtn = document.getElementById('start-btn');
-    const restartBtn = document.getElementById('restart-btn');
-    const scoreBadge = document.getElementById('score-badge');
-    const finalScore = document.getElementById('final-score');
-    const bestScoreEl = document.getElementById('best-score');
+          <form id="score-form" class="score-form">
+            <label for="player-name">Save your score to this browser’s leaderboard</label>
+            <div class="name-row">
+              <input
+                id="player-name"
+                name="playerName"
+                type="text"
+                maxlength="18"
+                autocomplete="nickname"
+                value="Player"
+                required
+              >
+              <button class="primary-button" type="submit">Save score</button>
+            </div>
+            <p class="form-status" id="save-status" aria-live="polite"></p>
+          </form>
 
-    const STORAGE_KEY = 'water-splash-best-score';
+          <div class="button-row">
+            <button class="secondary-button" id="game-over-scores-button" type="button">Leaderboard</button>
+            <button class="primary-button" id="play-again-button" type="button">Play again</button>
+          </div>
+        </div>
+      </section>
 
-    let gameRunning = false;
-    let animationFrameId = null;
-    let lastTimestamp = 0;
-    let spawnTimer = 0;
-    let score = 0;
-    let difficulty = 1;
-    let bestScore = Number(localStorage.getItem(STORAGE_KEY)) || 0;
+      <section class="overlay" id="leaderboard-overlay" aria-labelledby="leaderboard-title" hidden>
+        <div class="dialog leaderboard-dialog">
+          <p class="eyebrow">Your top runs</p>
+          <h2 id="leaderboard-title">Leaderboard</h2>
+          <p class="subtitle">Scores are saved on this device in this browser.</p>
+          <ol class="leaderboard-list" id="leaderboard-list"></ol>
+          <p class="empty-leaderboard" id="empty-leaderboard">No saved scores yet. Play a game and save your run!</p>
+          <button class="secondary-button" id="leaderboard-back-button" type="button">Back</button>
+        </div>
+      </section>
+    </section>
 
-    const player = {
-      x: 0,
-      y: 0,
-      size: 30,
-      speed: 320,
-      color: '#1e90ff'
-    };
-
-    const obstacles = [];
-
-    function resizeCanvas() {
-      const rect = gameContainer.getBoundingClientRect();
-      canvas.width = Math.max(300, rect.width);
-      canvas.height = Math.max(250, rect.height);
-
-      if (!gameRunning) {
-        player.x = canvas.width / 2 - player.size / 2;
-        player.y = canvas.height - player.size * 2;
-      }
-    }
-
-    function resetGame() {
-      obstacles.length = 0;
-      score = 0;
-      difficulty = 1;
-      spawnTimer = 0;
-      player.x = canvas.width / 2 - player.size / 2;
-      player.y = canvas.height - player.size * 2;
-      scoreBadge.textContent = `Score: ${score}`;
-    }
-
-    function showStartScreen() {
-      gameOverScreen.classList.add('hidden');
-      startScreen.classList.remove('hidden');
-    }
-
-    function hideStartScreen() {
-      startScreen.classList.add('hidden');
-      gameOverScreen.classList.add('hidden');
-    }
-
-    function updateBestScoreDisplay() {
-      bestScoreEl.textContent = `Best: ${bestScore}`;
-    }
-
-    function startGame() {
-      hideStartScreen();
-      resetGame();
-      gameRunning = true;
-      lastTimestamp = 0;
-      animationFrameId = requestAnimationFrame(gameLoop);
-    }
-
-    function endGame() {
-      gameRunning = false;
-      cancelAnimationFrame(animationFrameId);
-
-      if (score > bestScore) {
-        bestScore = score;
-        localStorage.setItem(STORAGE_KEY, String(bestScore));
-      }
-
-      finalScore.textContent = `Score: ${score}`;
-      updateBestScoreDisplay();
-      gameOverScreen.classList.remove('hidden');
-    }
-
-    function createObstacle() {
-      const width = 40 + Math.random() * 80;
-      const height = 18;
-
-      obstacles.push({
-        x: Math.random() * (canvas.width - width),
-        y: -height - 10,
-        width,
-        height,
-        speed: 180 + difficulty * 30
-      });
-    }
-
-    function update(dt) {
-      if (!gameRunning) return;
-
-      if (spawnTimer <= 0) {
-        createObstacle();
-        spawnTimer = Math.max(0.45, 1.1 - difficulty * 0.08) + Math.random() * 0.5;
-      } else {
-        spawnTimer -= dt;
-      }
-
-      for (let i = obstacles.length - 1; i >= 0; i--) {
-        const obstacle = obstacles[i];
-        obstacle.y += obstacle.speed * dt;
-
-        const playerBounds = {
-          left: player.x,
-          right: player.x + player.size,
-          top: player.y,
-          bottom: player.y + player.size
-        };
-
-        const obstacleBounds = {
-          left: obstacle.x,
-          right: obstacle.x + obstacle.width,
-          top: obstacle.y,
-          bottom: obstacle.y + obstacle.height
-        };
-
-        const colliding =
-          playerBounds.left < obstacleBounds.right &&
-          playerBounds.right > obstacleBounds.left &&
-          playerBounds.top < obstacleBounds.bottom &&
-          playerBounds.bottom > obstacleBounds.top;
-
-        if (colliding) {
-          endGame();
-          return;
-        }
-
-        if (obstacle.y > canvas.height) {
-          obstacles.splice(i, 1);
-          score += 1;
-          scoreBadge.textContent = `Score: ${score}`;
-          difficulty = 1 + score * 0.08;
-        }
-      }
-    }
-
-    function drawPlayer() {
-      ctx.fillStyle = player.color;
-      ctx.beginPath();
-      ctx.arc(player.x + player.size / 2, player.y + player.size / 2, player.size / 2, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    function drawObstacles() {
-      ctx.fillStyle = '#ff4c4c';
-      for (const obstacle of obstacles) {
-        ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
-      }
-    }
-
-    function drawScore() {
-      ctx.fillStyle = '#123';
-      ctx.font = '18px Arial';
-      ctx.fillText(`Score: ${score}`, 16, 28);
-    }
-
-    function render() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      drawObstacles();
-      drawPlayer();
-      drawScore();
-    }
-
-    function gameLoop(timestamp) {
-      if (!gameRunning) return;
-
-      if (!lastTimestamp) lastTimestamp = timestamp;
-      const dt = Math.min((timestamp - lastTimestamp) / 1000, 0.032);
-      lastTimestamp = timestamp;
-
-      update(dt);
-      render();
-
-      if (gameRunning) {
-        animationFrameId = requestAnimationFrame(gameLoop);
-      }
-    }
-
-    function handleMove(direction) {
-      if (!gameRunning) return;
-
-      const step = player.speed * (direction === 'left' ? -1 : 1);
-
-      player.x += step * (1 / 60);
-
-      player.x = Math.max(0, Math.min(canvas.width - player.size, player.x));
-    }
-
-    function handleKeyDown(event) {
-      if (event.key === 'ArrowLeft' || event.key.toLowerCase() === 'a') {
-        event.preventDefault();
-        handleMove('left');
-      } else if (event.key === 'ArrowRight' || event.key.toLowerCase() === 'd') {
-        event.preventDefault();
-        handleMove('right');
-      }
-    }
-
-    function handlePointerMove(event) {
-      if (!gameRunning) return;
-
-      const rect = canvas.getBoundingClientRect();
-      const pointerX = event.clientX - rect.left;
-
-      player.x = pointerX - player.size / 2;
-      player.x = Math.max(0, Math.min(canvas.width - player.size, player.x));
-    }
-
-    function handleTouchMove(event) {
-      if (!gameRunning) return;
-
-      const touch = event.touches[0];
-      if (!touch) return;
-
-      const rect = canvas.getBoundingClientRect();
-      const touchX = touch.clientX - rect.left;
-
-      player.x = touchX - player.size / 2;
-      player.x = Math.max(0, Math.min(canvas.width - player.size, player.x));
-    }
-
-    startBtn.addEventListener('click', startGame);
-    restartBtn.addEventListener('click', startGame);
-
-    document.addEventListener('keydown', handleKeyDown);
-    canvas.addEventListener('pointermove', handlePointerMove);
-    canvas.addEventListener('touchmove', handleTouchMove, { passive: true });
-
-    window.addEventListener('resize', resizeCanvas);
-
-    bestScore = Number(localStorage.getItem(STORAGE_KEY)) || 0;
-    updateBestScoreDisplay();
-    resizeCanvas();
-    resetGame();
-    showStartScreen();
-  </script>
+    <footer class="footer">
+      <span>Water Splash</span>
+      <span aria-hidden="true">·</span>
+      <a href="https://ghana-gpt.com">Made by Ghana-GPT</a>
+    </footer>
+  </main>
 </body>
 </html>
